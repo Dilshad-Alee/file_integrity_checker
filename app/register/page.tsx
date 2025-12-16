@@ -7,6 +7,14 @@ export default function RegisterPage() {
   const [msg, setMsg] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const allowedMimeTypes = [
+    "text/plain",
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/rtf",
+  ];
+
   async function registerFile() {
     if (!file) return;
 
@@ -25,9 +33,7 @@ export default function RegisterPage() {
   }
 
   function resetAll() {
-    setFile(null);
-    setMsg("");
-    if (fileRef.current) fileRef.current.value = "";
+    removeFile();
   }
 
   return (
@@ -42,7 +48,18 @@ export default function RegisterPage() {
         <input
           ref={fileRef}
           type="file"
-          onChange={(e) => setFile(e.target.files?.[0] || null)}
+          accept=".txt,.doc,.docx,.pdf,.rtf"
+          onChange={(e) => {
+            const selectedFile = e.target.files?.[0] || null;
+            if (selectedFile && !allowedMimeTypes.includes(selectedFile.type)) {
+              alert(
+                "Invalid file type. Only .txt, .doc, .docx, .pdf, or .rtf allowed."
+              );
+              e.target.value = "";
+              return;
+            }
+            setFile(selectedFile);
+          }}
           className="mb-4 w-full"
         />
 
@@ -73,9 +90,7 @@ export default function RegisterPage() {
         </div>
 
         {msg && (
-          <div className="mt-6 p-3 bg-green-100 text-green-800 rounded">
-            {msg}
-          </div>
+          <div className="mt-6 p-3 bg-green-100 text-green-800 rounded">{msg}</div>
         )}
       </main>
     </div>

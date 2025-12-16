@@ -8,6 +8,14 @@ export default function VerifyPage() {
   const [explanation, setExplanation] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const allowedMimeTypes = [
+    "text/plain",
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/rtf",
+  ];
+
   async function verify() {
     if (!file) return;
 
@@ -36,10 +44,7 @@ export default function VerifyPage() {
   }
 
   function resetAll() {
-    setFile(null);
-    setStatus("");
-    setExplanation("");
-    if (fileRef.current) fileRef.current.value = "";
+    removeFile();
   }
 
   return (
@@ -54,7 +59,18 @@ export default function VerifyPage() {
         <input
           ref={fileRef}
           type="file"
-          onChange={(e) => setFile(e.target.files?.[0] || null)}
+          accept=".txt,.doc,.docx,.pdf,.rtf"
+          onChange={(e) => {
+            const selectedFile = e.target.files?.[0] || null;
+            if (selectedFile && !allowedMimeTypes.includes(selectedFile.type)) {
+              alert(
+                "Invalid file type. Only .txt, .doc, .docx, .pdf, or .rtf allowed."
+              );
+              e.target.value = "";
+              return;
+            }
+            setFile(selectedFile);
+          }}
           className="mb-4 w-full"
         />
 
